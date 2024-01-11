@@ -37,11 +37,6 @@ exports.createTour = (req, res) => {
 
 exports.getTour = (req, res) => {
   const id = +req.params.id;
-  if (id > tours.length) {
-    res
-      .status(400)
-      .json({ status: "fail", data: { id: `${id} is not a valid ID` } });
-  }
 
   const tour = tours.find((el) => el.id === id);
 
@@ -50,11 +45,6 @@ exports.getTour = (req, res) => {
 
 exports.deleteTour = (req, res) => {
   const id = +req.params.id;
-  if (id > tours.length) {
-    res
-      .status(400)
-      .json({ status: "fail", data: { id: `${id} is not a valid ID` } });
-  }
 
   tours = tours.filter((el) => el.id !== id);
 
@@ -77,11 +67,6 @@ exports.deleteTour = (req, res) => {
 
 exports.updateTour = (req, res) => {
   const id = +req.params.id;
-  if (id > tours.length) {
-    res
-      .status(400)
-      .json({ status: "fail", data: { id: `${id} is not a valid ID` } });
-  }
 
   const tour = tours.find((el) => el.id === id);
 
@@ -92,4 +77,14 @@ exports.updateTour = (req, res) => {
   }
 
   res.status(200).json({ status: "success", data: { tour } });
+};
+
+exports.verifyID = (req, res, next, id) => {
+  if (+id > tours.length) {
+    res
+      .status(400)
+      .json({ status: "fail", data: { id: `${id} is not a valid ID` } });
+  }
+
+  next();
 };

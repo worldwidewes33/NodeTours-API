@@ -4,6 +4,8 @@ const router = express.Router();
 
 const tourController = require("./../controllers/toursController");
 
+router.param("id", tourController.verifyID);
+
 router
   .route("/")
   .get(tourController.getAllTours)
