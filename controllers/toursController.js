@@ -88,3 +88,13 @@ exports.verifyID = (req, res, next, id) => {
 
   next();
 };
+
+exports.verifyBody = (req, res, next) => {
+  if (!req.body.name || !req.body.price) {
+    res.status(400).json({
+      status: "fail",
+      data: { tour: req.body },
+      message: "tour requires a valid name and price field",
+    });
+  } else next();
+};
