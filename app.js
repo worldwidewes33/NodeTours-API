@@ -12,6 +12,7 @@ const app = express();
 
 app.use(express.json());
 
+// Tour Routes
 app.get("/api/tours", (req, res) => {
   res.status(200).json({ status: "success", data: { tours } });
 });
@@ -33,9 +34,22 @@ app.post("/api/tours", (req, res) => {
         });
       }
 
-      res.json({ status: "success", data: { tour: newTour } });
+      res.status(201).json({ status: "success", data: { tour: newTour } });
     }
   );
+});
+
+app.get("/api/tours/:id", (req, res) => {
+  const id = +req.params.id;
+  if (id > tours.length) {
+    res
+      .status(400)
+      .json({ status: "fail", data: { id: `${id} is not a valid ID` } });
+  }
+
+  const tour = tours.find((el) => el.id === id);
+
+  res.status(200).json({ status: "success", data: { tour } });
 });
 
 app.listen(3000);
