@@ -1,11 +1,11 @@
 const fs = require("fs");
 const path = require("path");
 
+const rootDir = require("./../util/path");
+
 // read tours from file
 let tours = JSON.parse(
-  fs.readFileSync(
-    path.join(__dirname, "..", "dev-data", "data", "tours-simple.json")
-  )
+  fs.readFileSync(path.join(rootDir, "dev-data", "data", "tours-simple.json"))
 );
 
 exports.getAllTours = (req, res) => {
@@ -19,7 +19,7 @@ exports.createTour = (req, res) => {
 
   // write new tour to file
   fs.writeFile(
-    path.join(__dirname, "..", "dev-data", "data", "tours-simple.json"),
+    path.join(rootDir, "dev-data", "data", "tours-simple.json"),
     JSON.stringify(tours),
     (err) => {
       if (err) {
@@ -50,7 +50,7 @@ exports.deleteTour = (req, res) => {
 
   // write updated tours to file
   fs.writeFile(
-    path.join(__dirname, "..", "dev-data", "data", "tours-simple.json"),
+    path.join(rootDir, "dev-data", "data", "tours-simple.json"),
     JSON.stringify(tours),
     (err) => {
       if (err) {
