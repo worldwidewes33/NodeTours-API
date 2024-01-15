@@ -2,7 +2,20 @@ const Tour = require("./../models/tourModel");
 
 exports.getAllTours = async (req, res) => {
   try {
-    const tours = await Tour.find();
+    // BASIC FILTERS
+    const queryObj = { ...req.query };
+    const excludedFields = ["sort", "page", "limit", "fields"];
+    excludedFields.forEach((el) => delete queryObj[el]);
+
+    // ADVANCED FILTERS
+    let queryStr = JSON.stringify(queryObj);
+
+    // replace any instance of the words lt, lte, gt, gte with mongodb equivalent
+    queryStr = queryStr.replace(/\b(lt|lte|gt|gte)\b/g, (match) => `$${match}`);
+
+    const tours = await Tour.find(JSON.parse(queryStr));
+
+    // send response
     res.status(200).json({ status: "success", data: { tours } });
   } catch (err) {
     res
