@@ -13,14 +13,47 @@ exports.getAllTours = async (req, res) => {
     // replace any instance of the words lt, lte, gt, gte with mongodb equivalent
     queryStr = queryStr.replace(/\b(lt|lte|gt|gte)\b/g, (match) => `$${match}`);
 
-    const tours = await Tour.find(JSON.parse(queryStr));
+    const query = Tour.find(JSON.parse(queryStr));
+
+    // SORT QUERY
+    if (req.query.sort) {
+      const sortParams = req.query.sort.replace(/,/g, " ");
+      query.sort(sortParams);
+    } else {
+      query.sort("-createdAt");
+    }
+
+    // RESTRICT FIELDS
+    if (req.query.fields) {
+      const fields = req.query.fields.replace(/,/g, " ");
+
+      query.select(fields);
+    }
+    query.select("-__v");
+
+    // Limits and Pagination
+    const limit = +req.query.limit || 100;
+    const page = +req.query.page || 1;
+    const skip = (page - 1) * limit;
+
+    const docCount = await Tour.countDocuments();
+
+    console.log(docCount);
+
+    if (skip >= docCount) {
+      throw new Error("Page Does Not Exists");
+    }
+
+    query.skip(skip).limit(limit);
+
+    const tours = await query;
 
     // send response
     res.status(200).json({ status: "success", data: { tours } });
   } catch (err) {
     res
-      .status(500)
-      .json({ status: "error", message: "Unable to query database" });
+      .status(400)
+      .json({ status: "fail", message: "Unable to query database" });
   }
 };
 
