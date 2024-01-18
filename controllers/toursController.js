@@ -1,9 +1,14 @@
 const Tour = require("./../models/tourModel");
 
-exports.getAllTours = async (req, res) => {
-  try {
+class QueryAPI {
+  constructor(query, queryObj) {
+    this.query = query;
+    this.queryObj = queryObj;
+  }
+
+  filter() {
     // BASIC FILTERS
-    const queryObj = { ...req.query };
+    const queryObj = { ...this.queryObj };
     const excludedFields = ["sort", "page", "limit", "fields"];
     excludedFields.forEach((el) => delete queryObj[el]);
 
@@ -13,47 +18,56 @@ exports.getAllTours = async (req, res) => {
     // replace any instance of the words lt, lte, gt, gte with mongodb equivalent
     queryStr = queryStr.replace(/\b(lt|lte|gt|gte)\b/g, (match) => `$${match}`);
 
-    const query = Tour.find(JSON.parse(queryStr));
+    this.query = this.query.find(JSON.parse(queryStr));
+    return this;
+  }
 
+  sort() {
     // SORT QUERY
-    if (req.query.sort) {
-      const sortParams = req.query.sort.replace(/,/g, " ");
-      query.sort(sortParams);
+    if (this.queryObj.sort) {
+      const sortParams = this.queryObj.sort.replace(/,/g, " ");
+      this.query = this.query.sort(sortParams);
     } else {
-      query.sort("-createdAt");
+      this.query = this.query.sort("-createdAt");
     }
+    return this;
+  }
 
-    // RESTRICT FIELDS
-    if (req.query.fields) {
-      const fields = req.query.fields.replace(/,/g, " ");
+  limitFields() {
+    // LIMIT FIELDS
+    if (this.queryObj.fields) {
+      const fields = this.queryObj.fields.replace(/,/g, " ");
 
-      query.select(fields);
+      this.query = this.query.select(fields);
     }
-    query.select("-__v");
+    this.query = this.query.select("-__v");
 
-    // Limits and Pagination
-    const limit = +req.query.limit || 100;
-    const page = +req.query.page || 1;
+    return this;
+  }
+
+  paginate() {
+    // PAGINATION
+    const limit = +this.queryObj.limit || 100;
+    const page = +this.queryObj.page || 1;
     const skip = (page - 1) * limit;
 
-    const docCount = await Tour.countDocuments();
+    this.query = this.query.skip(skip).limit(limit);
+    return this;
+  }
+}
 
-    console.log(docCount);
+exports.getAllTours = async (req, res) => {
+  try {
+    const queryAPI = new QueryAPI(Tour.find(), req.query);
 
-    if (skip >= docCount) {
-      throw new Error("Page Does Not Exists");
-    }
+    queryAPI.filter().sort().limitFields().paginate();
 
-    query.skip(skip).limit(limit);
-
-    const tours = await query;
+    const tours = await queryAPI.query;
 
     // send response
     res.status(200).json({ status: "success", data: { tours } });
   } catch (err) {
-    res
-      .status(400)
-      .json({ status: "fail", message: "Unable to query database" });
+    res.status(400).json({ status: "fail", message: err });
   }
 };
 
