@@ -59,6 +59,7 @@ const tourSchema = new mongoose.Schema({
   discountPct: {
     type: Number,
     max: [99, "A tour discount cannot be greater than or equal to 100%"],
+    min: [1, "A tour discount cannot be less than or equal to 0%"],
   },
 });
 

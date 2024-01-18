@@ -53,3 +53,5 @@ class QueryAPI {
     return this;
   }
 }
+
+module.exports = QueryAPI;
