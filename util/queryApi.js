@@ -1,9 +1,22 @@
+/**
+ * Manipulates mongoose query objects by filtering, sorting, limiting fields, and providing pagination for query results
+ * @module queryApi
+ */
 class QueryAPI {
+  /**
+   * @constructor
+   * @param {Mongoose Query} query - a mongoose query
+   * @param {object} queryObj - an express request query property
+   */
   constructor(query, queryObj) {
     this.query = query;
     this.queryObj = queryObj;
   }
 
+  /**
+   * Filters results by specified fields
+   * @returns {QueryAPI} - the QueryAPI instance
+   */
   filter() {
     // BASIC FILTERS
     const queryObj = { ...this.queryObj };
@@ -20,8 +33,11 @@ class QueryAPI {
     return this;
   }
 
+  /**
+   * Sorts the results by the sort property
+   * @returns {QueryAPI} - the QueryAPI instance
+   */
   sort() {
-    // SORT QUERY
     if (this.queryObj.sort) {
       const sortParams = this.queryObj.sort.replace(/,/g, " ");
       this.query = this.query.sort(sortParams);
@@ -31,8 +47,11 @@ class QueryAPI {
     return this;
   }
 
+  /**
+   * Limits the returned fields by the fields property
+   * @returns {QueryAPI} - the QueryAPI instance
+   */
   limitFields() {
-    // LIMIT FIELDS
     if (this.queryObj.fields) {
       const fields = this.queryObj.fields.replace(/,/g, " ");
 
@@ -43,8 +62,11 @@ class QueryAPI {
     return this;
   }
 
+  /**
+   * Provides pagination features by limiting and skipping the specified number of results
+   * @returns {QueryAPI} - the QueryAPI instance
+   */
   paginate() {
-    // PAGINATION
     const limit = +this.queryObj.limit || 100;
     const page = +this.queryObj.page || 1;
     const skip = (page - 1) * limit;

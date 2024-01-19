@@ -1,8 +1,13 @@
+/**
+ * @module app
+ */
+
 const express = require("express");
 const morgan = require("morgan");
 
 const tourRouter = require("./routes/tourRoutes");
 const APIError = require("./util/apiError");
+const errorHandler = require("./controllers/errorController");
 
 const app = express();
 
@@ -15,6 +20,7 @@ if (process.env.NODE_ENV === "development") {
 // Tour Routes
 app.use("/api/tours", tourRouter);
 
+// Catch all route
 app.all("*", (req, res, next) => {
   const error = new APIError(
     `Cannot reach ${req.originalUrl} on this server.`,
@@ -23,13 +29,6 @@ app.all("*", (req, res, next) => {
   next(error);
 });
 
-app.use((error, req, res, next) => {
-  error.statusCode = error.statusCode || 500;
-  error.status = error.status || "error";
-
-  res
-    .status(error.statusCode)
-    .json({ status: error.status, message: error.message });
-});
+app.use(errorHandler);
 
 module.exports = app;

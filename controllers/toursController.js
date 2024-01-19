@@ -1,3 +1,8 @@
+/**
+ * @module tourController
+ * All CRUD operations for the Tour Model
+ */
+
 const Tour = require("./../models/tourModel");
 const QueryAPI = require("./../util/queryApi");
 

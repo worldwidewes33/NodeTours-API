@@ -1,4 +1,13 @@
+/**
+ * @module apiError
+ * Custom error class for all API operational errors
+ */
 class APIError extends Error {
+  /**
+   * @constructor
+   * @param {String} message - error message
+   * @param {Number} statusCode - http status code with format 4XX or 5XX
+   */
   constructor(message, statusCode) {
     super(message);
 
