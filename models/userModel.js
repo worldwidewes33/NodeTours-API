@@ -21,6 +21,15 @@ const userSchema = new mongoose.Schema({
       message: "Invalid email: {VALUE}",
     },
   },
+  role: {
+    type: String,
+    default: "user",
+    enum: {
+      values: ["user", "guide", "lead-guide", "admin"],
+      message:
+        "A user's role can only be one of: user, guide, lead-guide, and admin",
+    },
+  },
   photo: String,
   password: {
     type: String,

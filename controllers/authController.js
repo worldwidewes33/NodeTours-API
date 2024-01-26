@@ -94,3 +94,16 @@ exports.protect = catchAsync(async (req, res, next) => {
   req.user = user;
   next();
 });
+
+exports.restrict = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      const error = new APIError(
+        `User is restricted from access this resource`,
+        403
+      );
+      return next(error);
+    }
+    next();
+  };
+};
