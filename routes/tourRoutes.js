@@ -3,13 +3,14 @@ const express = require("express");
 const router = express.Router();
 
 const tourController = require("./../controllers/toursController");
+const authController = require("./../controllers/authController");
 
 // param middleware
 // router.param("id", tourController.verifyID);
 
 router
   .route("/")
-  .get(tourController.getAllTours)
+  .get(authController.protect, tourController.getAllTours)
   .post(tourController.createTour);
 
 router

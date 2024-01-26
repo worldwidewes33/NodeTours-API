@@ -12,6 +12,8 @@ module.exports = (err, req, res, next) => {
     if (err.name === "CastError") error = handleCastErrorDB(err);
     if (err.code === 11000) error = handleDuplicateFieldDB(err);
     if (err.name === "ValidationError") error = handleValidationErrorDB(err);
+    if (err.name === "JsonWebTokenError") error = handleJWTError();
+    if (err.name === "TokenExpiredError") error = handleJWTExpiredError();
 
     if (error) {
       sendErrorProd(error, res);
@@ -60,4 +62,12 @@ function handleValidationErrorDB(err) {
   const values = Object.values(err.errors).map((el) => el.message);
   const message = `Invalid input values: ${values.join(". ")}`;
   return new APIError(message, 400);
+}
+
+function handleJWTError() {
+  return new APIError("Invalid token. Please login again.", 401);
+}
+
+function handleJWTExpiredError() {
+  return new APIError("Token is expired. Please login again.", 401);
 }
