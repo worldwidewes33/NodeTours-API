@@ -20,7 +20,7 @@ class QueryAPI {
   filter() {
     // BASIC FILTERS
     const queryObj = { ...this.queryObj };
-    const excludedFields = ["sort", "page", "limit", "fields"];
+    const excludedFields = ['sort', 'page', 'limit', 'fields'];
     excludedFields.forEach((el) => delete queryObj[el]);
 
     // ADVANCED FILTERS
@@ -39,10 +39,10 @@ class QueryAPI {
    */
   sort() {
     if (this.queryObj.sort) {
-      const sortParams = this.queryObj.sort.replace(/,/g, " ");
+      const sortParams = this.queryObj.sort.replace(/,/g, ' ');
       this.query = this.query.sort(sortParams);
     } else {
-      this.query = this.query.sort("-createdAt");
+      this.query = this.query.sort('-createdAt');
     }
     return this;
   }
@@ -53,11 +53,11 @@ class QueryAPI {
    */
   limitFields() {
     if (this.queryObj.fields) {
-      const fields = this.queryObj.fields.replace(/,/g, " ");
+      const fields = this.queryObj.fields.replace(/,/g, ' ');
 
       this.query = this.query.select(fields);
     }
-    this.query = this.query.select("-__v");
+    this.query = this.query.select('-__v');
 
     return this;
   }

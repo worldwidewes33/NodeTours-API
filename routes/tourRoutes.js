@@ -1,26 +1,26 @@
-const express = require("express");
+const express = require('express');
 
 const router = express.Router();
 
-const tourController = require("./../controllers/toursController");
-const authController = require("./../controllers/authController");
+const tourController = require('../controllers/toursController');
+const authController = require('../controllers/authController');
 
 // param middleware
 // router.param("id", tourController.verifyID);
 
 router
-  .route("/")
+  .route('/')
   .get(authController.protect, tourController.getAllTours)
   .post(tourController.createTour);
 
 router
-  .route("/:id")
+  .route('/:id')
   .get(tourController.getTour)
   .patch(tourController.updateTour)
   .delete(
     authController.protect,
-    authController.restrict("admin", "lead-guide"),
-    tourController.deleteTour
+    authController.restrictTo('admin', 'lead-guide'),
+    tourController.deleteTour,
   );
 
 module.exports = router;
