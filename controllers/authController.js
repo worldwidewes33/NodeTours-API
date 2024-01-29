@@ -39,10 +39,10 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   const user = await User.findOne({ email }).select('+password');
-  const verifyPassword = await user?.verifyPassword(password, user.password);
+  const passwordVerified = await user?.verifyPassword(password, user.password);
 
   // Verify user exists and password matches
-  if (!user || !verifyPassword) {
+  if (!user || !passwordVerified) {
     const error = new APIError('The email or password is invalid', 401);
     return next(error);
   }
@@ -173,6 +173,35 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   user.passwordResetTokenExpires = undefined;
   await user.save();
 
+  // Sign token
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+
+  res.status(200).json({ status: 'success', token });
+});
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // Get user with password
+  const user = await User.findById(req.user.id).select('+password');
+
+  // verify password
+  const passwordVerified = user.verifyPassword(
+    req.body.password,
+    user.password,
+  );
+
+  if (!passwordVerified) {
+    const error = new APIError('The password is incorrect', 401);
+    return next(error);
+  }
+
+  // Update password
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+
+  // Sign token
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
