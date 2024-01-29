@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 const nodemailer = require('nodemailer');
 
 module.exports = async (options) => {

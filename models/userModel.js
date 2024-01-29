@@ -66,6 +66,13 @@ userSchema.pre('save', async function (next) {
   this.passwordConfirm = undefined;
 });
 
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+
+  this.passwordChangedAfter = Date.now();
+  next();
+});
+
 userSchema.methods.verifyPassword = async function (
   testPassword,
   userPassword,
