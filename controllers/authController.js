@@ -14,7 +14,15 @@ const createSendJWT = (user, statusCode, res) => {
 
   user.password = undefined;
 
-  res.status(statusCode).json({ status: 'success', token, user });
+  res
+    .cookie('access_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      // cookie expires after 24 hours
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    })
+    .status(statusCode)
+    .json({ status: 'success', user });
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
@@ -54,13 +62,12 @@ exports.login = catchAsync(async (req, res, next) => {
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
+  const token = req.cookies.access_token;
   // Get the token
-  if (!req.headers.authorization?.startsWith('Bearer')) {
+  if (!token) {
     const error = new APIError('Please login to access this resource', 401);
     return next(error);
   }
-
-  const token = req.headers.authorization.split(' ')[1];
 
   // Verify token
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
