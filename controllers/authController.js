@@ -7,6 +7,16 @@ const catchAsync = require('../util/catchAsync');
 const APIError = require('../util/apiError');
 const sendEmail = require('../util/email');
 
+const createSendJWT = (user, statusCode, res) => {
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+
+  user.password = undefined;
+
+  res.status(statusCode).json({ status: 'success', token, user });
+};
+
 exports.signup = catchAsync(async (req, res, next) => {
   const { name, email, password, passwordConfirm, passwordUpdatedAt } =
     req.body;
@@ -18,15 +28,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordUpdatedAt,
   });
 
-  const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
-  });
-
-  res.status(201).json({
-    status: 'success',
-    token,
-    user: newUser,
-  });
+  createSendJWT(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -38,7 +40,7 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(error);
   }
 
-  const user = await User.findOne({ email }).select('+password');
+  const user = await User.findOne({ email }).select('+password -__v');
   const passwordVerified = await user?.verifyPassword(password, user.password);
 
   // Verify user exists and password matches
@@ -48,11 +50,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // Sign token and send response
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
-  });
-
-  res.status(200).json({ status: 'success', token });
+  createSendJWT(user, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -159,7 +157,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   const user = await User.findOne({
     passwordResetToken: hashedToken,
     passwordResetTokenExpires: { $gt: Date.now() },
-  });
+  }).select('-__v');
 
   if (!user) {
     const error = new APIError('Token is invalid or expired', 400);
@@ -174,20 +172,16 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // Sign token
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
-  });
-
-  res.status(200).json({ status: 'success', token });
+  createSendJWT(user, 200, res);
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
   // Get user with password
-  const user = await User.findById(req.user.id).select('+password');
+  const user = await User.findById(req.user.id).select('+password -__v');
 
   // verify password
-  const passwordVerified = user.verifyPassword(
-    req.body.password,
+  const passwordVerified = await user.verifyPassword(
+    req.body.currentPassword,
     user.password,
   );
 
@@ -202,9 +196,5 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // Sign token
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
-  });
-
-  res.status(200).json({ status: 'success', token });
+  createSendJWT(user, 200, res);
 });
