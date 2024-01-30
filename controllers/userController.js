@@ -11,6 +11,7 @@ const filterObj = (obj, ...fields) => {
 };
 
 exports.updateMe = catchAsync(async (req, res, next) => {
+  // Check if any password information was patched
   if (req.body.password || req.body.passwordConfirm) {
     const error = new APIError(
       'Cannot update user password. Please us route /updatePassword',
@@ -19,6 +20,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     return next(error);
   }
 
+  // Update user fields for name and email only
   const updatedUser = await User.findByIdAndUpdate(
     req.user.id,
     filterObj(req.body, 'name', 'email'),
@@ -29,4 +31,10 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   );
 
   res.status(200).json({ status: 'success', user: updatedUser });
+});
+
+exports.deleteMe = catchAsync(async (req, res, next) => {
+  await User.findByIdAndUpdate(req.user.id, { active: false });
+
+  res.status(204).json({ status: 'success', data: null });
 });
