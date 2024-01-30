@@ -2,6 +2,7 @@ const User = require('../models/userModel');
 const catchAsync = require('../util/catchAsync');
 const APIError = require('../util/apiError');
 
+// Helper functions
 const filterObj = (obj, ...fields) => {
   const filteredObj = {};
   Object.keys(obj).forEach((el) => {
@@ -9,6 +10,13 @@ const filterObj = (obj, ...fields) => {
   });
   return filteredObj;
 };
+
+// User Middleware functions
+exports.getAllUsers = catchAsync(async (req, res, next) => {
+  const users = await User.find().select('-__v');
+
+  res.status(200).json({ status: 'success', data: users });
+});
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   // Check if any password information was patched
