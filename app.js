@@ -5,6 +5,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+const rateLimit = require('express-rate-limit');
 
 const tourRouter = require('./routes/tourRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -13,8 +14,17 @@ const errorHandler = require('./controllers/errorController');
 
 const app = express();
 
+// configure rate limit middleware
+const limiter = rateLimit({
+  windowMS: 60 * 60 * 1000,
+  limit: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 app.use(express.json());
 app.use(cookieParser());
+app.use(limiter);
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
