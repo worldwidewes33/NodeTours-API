@@ -54,6 +54,7 @@ const tourSchema = new mongoose.Schema({
   images: [String],
   startDates: [Date],
   startLocation: {
+    // GeoJSON
     type: {
       type: String,
       default: 'Point',
@@ -63,6 +64,7 @@ const tourSchema = new mongoose.Schema({
     address: String,
     description: String,
   },
+  // Array of objects creates embedded documents
   locations: [
     {
       type: {
@@ -85,6 +87,7 @@ const tourSchema = new mongoose.Schema({
     max: [99, 'A tour discount cannot be greater than or equal to 100%'],
     min: [1, 'A tour discount cannot be less than or equal to 0%'],
   },
+  // Child reference for User model
   guides: [
     {
       type: mongoose.Schema.Types.ObjectId,
