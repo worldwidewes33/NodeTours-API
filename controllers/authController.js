@@ -22,7 +22,7 @@ const createSendJWT = (user, statusCode, res) => {
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
     })
     .status(statusCode)
-    .json({ status: 'success', user });
+    .json({ status: 'success', data: { user } });
 };
 
 exports.signup = catchAsync(async (req, res, next) => {

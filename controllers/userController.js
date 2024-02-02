@@ -38,7 +38,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     },
   );
 
-  res.status(200).json({ status: 'success', user: updatedUser });
+  res.status(200).json({ status: 'success', data: { user: updatedUser } });
 });
 
 exports.deleteMe = catchAsync(async (req, res, next) => {
