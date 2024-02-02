@@ -96,8 +96,17 @@ const tourSchema = new mongoose.Schema({
   ],
 });
 
-tourSchema.pre('save', function () {
+tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
+  next();
+});
+
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: 'name email role photo',
+  });
+  next();
 });
 
 const Tour = mongoose.model('Tour', tourSchema);
