@@ -53,6 +53,28 @@ const tourSchema = new mongoose.Schema({
   },
   images: [String],
   startDates: [Date],
+  startLocation: {
+    type: {
+      type: String,
+      default: 'Point',
+      enum: ['Point'],
+    },
+    coordinates: [Number],
+    address: String,
+    description: String,
+  },
+  locations: [
+    {
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+      coordinates: [Number],
+      description: String,
+      day: Number,
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now(),
@@ -63,6 +85,12 @@ const tourSchema = new mongoose.Schema({
     max: [99, 'A tour discount cannot be greater than or equal to 100%'],
     min: [1, 'A tour discount cannot be less than or equal to 0%'],
   },
+  guides: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+  ],
 });
 
 tourSchema.pre('save', function () {

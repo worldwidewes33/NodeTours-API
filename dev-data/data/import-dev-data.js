@@ -20,9 +20,7 @@ mongoose
   .then(() => console.log('Connected to database'))
   .catch((err) => console.log(err));
 
-const tours = JSON.parse(
-  fs.readFileSync(path.join(rootDir, 'tours-simple.json')),
-);
+const tours = JSON.parse(fs.readFileSync(path.join(rootDir, 'tours.json')));
 
 const uploadTours = async () => {
   try {
