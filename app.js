@@ -13,6 +13,8 @@ const hpp = require('hpp');
 
 const tourRouter = require('./routes/tourRoutes');
 const userRoutes = require('./routes/userRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
+
 const APIError = require('./util/apiError');
 const errorHandler = require('./controllers/errorController');
 
@@ -66,6 +68,9 @@ app.use('/api/tours', tourRouter);
 
 // User Routes
 app.use('/api/users', userRoutes);
+
+// Review routes
+app.use('/api/reviews', reviewRoutes);
 
 // Catch all route
 app.all('*', (req, res, next) => {
