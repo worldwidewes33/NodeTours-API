@@ -1,6 +1,7 @@
 const User = require('../models/userModel');
 const catchAsync = require('../util/catchAsync');
 const APIError = require('../util/apiError');
+const factory = require('./helperFactory');
 
 // Helper functions
 const filterObj = (obj, ...fields) => {
@@ -46,3 +47,6 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
 
   res.status(204).json({ status: 'success', data: null });
 });
+
+exports.updateUser = factory.updateOne(User);
+exports.deleteUser = factory.deleteOne(User);
