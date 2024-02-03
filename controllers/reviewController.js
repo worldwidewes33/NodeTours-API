@@ -20,12 +20,7 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
   res.status(200).json({ status: 'success', data: reviews });
 });
 
-exports.getReview = catchAsync(async (req, res, next) => {
-  const review = await Review.findById({ _id: req.params.id });
-
-  res.status(200).json({ status: 'success', data: review });
-});
-
+exports.getReview = factory.getOne(Review);
 exports.createReview = factory.createOne(Review);
 exports.updateReview = factory.updateOne(Review);
 exports.deleteReview = factory.deleteOne(Review);

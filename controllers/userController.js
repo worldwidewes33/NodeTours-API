@@ -13,11 +13,6 @@ const filterObj = (obj, ...fields) => {
 };
 
 // User Middleware functions
-exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find().select('-__v');
-
-  res.status(200).json({ status: 'success', data: users });
-});
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   // Check if any password information was patched
@@ -48,5 +43,7 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   res.status(204).json({ status: 'success', data: null });
 });
 
+exports.getAllUsers = factory.getMany(User);
+exports.getUser = factory.getOne(User);
 exports.updateUser = factory.updateOne(User);
 exports.deleteUser = factory.deleteOne(User);
