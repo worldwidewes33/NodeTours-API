@@ -13,6 +13,10 @@ const filterObj = (obj, ...fields) => {
 };
 
 // User Middleware functions
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+};
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   // Check if any password information was patched
