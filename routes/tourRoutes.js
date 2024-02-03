@@ -2,11 +2,14 @@ const express = require('express');
 
 const tourController = require('../controllers/toursController');
 const authController = require('../controllers/authController');
+const reviewRouter = require('./reviewRoutes');
 
 const router = express.Router();
 
 // param middleware
 // router.param("id", tourController.verifyID);
+
+router.use('/:tourId/reviews', reviewRouter);
 
 router
   .route('/')
