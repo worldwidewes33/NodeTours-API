@@ -76,17 +76,13 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
   });
 };
 
-reviewSchema.pre(/^findOneAnd/, async function (next) {
-  this.review = await this.model.findOne(this.getQuery());
-  next();
-});
-
 reviewSchema.post('save', function (doc, next) {
   this.constructor.calcAverageRatings(doc.tour);
   next();
 });
-reviewSchema.post(/^findOneAnd/, async function () {
-  await this.review.constructor.calcAverageRatings(this.review.tour);
+// eslint-disable-next-line prefer-arrow-callback
+reviewSchema.post(/^findOneAnd/, async function (result) {
+  await result.constructor.calcAverageRatings(result.tour);
 });
 
 const Review = mongoose.model('Review', reviewSchema);
