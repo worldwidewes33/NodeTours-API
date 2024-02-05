@@ -76,10 +76,13 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
   });
 };
 
+reviewSchema.index({ tour: 1, author: 1 }, { unique: true });
+
 reviewSchema.post('save', function (doc, next) {
   this.constructor.calcAverageRatings(doc.tour);
   next();
 });
+
 // eslint-disable-next-line prefer-arrow-callback
 reviewSchema.post(/^findOneAnd/, async function (result) {
   await result.constructor.calcAverageRatings(result.tour);
