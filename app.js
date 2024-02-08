@@ -1,6 +1,7 @@
 /**
  * @module app
  */
+const path = require('path');
 
 const express = require('express');
 const morgan = require('morgan');
@@ -17,8 +18,13 @@ const reviewRoutes = require('./routes/reviewRoutes');
 
 const APIError = require('./util/apiError');
 const errorHandler = require('./controllers/errorController');
+const rootDir = require('./util/path');
 
 const app = express();
+
+// Set up template engine
+app.set('view engine', 'pug');
+app.set('views', path.join(rootDir, 'views'));
 
 // Global Middleware Functions
 // Set http security headers
@@ -39,7 +45,7 @@ app.use(limiter);
 app.use(express.json());
 app.use(cookieParser());
 
-// Sanitize requests against malicios mongodb code
+// Sanitize requests against malicious mongodb code
 app.use(mongoSanitize());
 
 // Sanitize request against xss attack
@@ -58,18 +64,21 @@ app.use(
   }),
 );
 
+app.use(express.static(path.join(rootDir, 'public')));
+
 // request logging
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-// Tour Routes
+// View routes
+app.get('/', (req, res) => {
+  res.status(200).render('base');
+});
+
+// API Routes
 app.use('/api/tours', tourRouter);
-
-// User Routes
 app.use('/api/users', userRoutes);
-
-// Review routes
 app.use('/api/reviews', reviewRoutes);
 
 // Catch all route
